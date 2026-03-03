@@ -64,10 +64,15 @@ client.on("message", async (_topic, buf) => {
       throw new Error("Missing required fields");
     }
 
+    const delayInMinutes =
+      (Date.now() - new Date(ts).getTime()) / (1000 * 60);
+
+    console.log("Delay in minutes:", delayInMinutes);
+
     await pool.execute(
       `INSERT INTO Transaction_Table 
-      (device_id, tank_no, date_time, ultra_height, lidar_height, location, ul_status)
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  (device_id, tank_no, date_time, ultra_height, lidar_height, location, ul_status, last_inserted)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         device_id,
         tank_no,
@@ -76,7 +81,8 @@ client.on("message", async (_topic, buf) => {
         lidar_height,
         location,
         ul_status,
-      ]
+        new Date(), // ✅ correct
+      ],
     );
 
     log.info("Inserted into DB successfully");
